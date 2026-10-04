@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Random;
 
 public class BenchmarkRunner {
@@ -59,11 +60,12 @@ public class BenchmarkRunner {
         }
 
         // DynamicArray
-        for (int r = 0; r < 2; r++) { // Warm-up
-            DynamicArray da = new DynamicArray(n);
-            for (int x : data) da.add(x);
-            for (int idx : indices) da.get(idx);
+        DynamicArray daWarm = new DynamicArray(n);
+        for (int x : data) daWarm.add(x);
+        for (int r = 0; r < 5; r++) {
+            for (int i = 0; i < Math.min(1000, queries); i++) daWarm.get(indices[i]);
         }
+
         double[] timesDA = new double[RUNS];
         long stepsDA = 0, movesDA = 0, compDA = 0;
         for (int r = 0; r < RUNS; r++) {
@@ -77,14 +79,15 @@ public class BenchmarkRunner {
             movesDA = da.getMetrics().moves;
             compDA = da.getMetrics().comparisons;
         }
-        writer.printf("W1,default,DynamicArray,%d,%.4f,%d,%d,%d\n", n, median(timesDA), stepsDA, movesDA, compDA);
+        writer.printf(Locale.US, "W1,default,DynamicArray,%d,%.4f,%d,%d,%d\n", n, median(timesDA), stepsDA, movesDA, compDA);
 
         // MyLinkedList
-        for (int r = 0; r < 2; r++) { // Warm-up
-            MyLinkedList list = new MyLinkedList();
-            for (int x : data) list.add(x);
-            for (int i = 0; i < Math.min(100, queries); i++) list.get(indices[i]);
+        MyLinkedList llWarm = new MyLinkedList();
+        for (int x : data) llWarm.add(x);
+        for (int r = 0; r < 5; r++) {
+            for (int i = 0; i < Math.min(50, queries); i++) llWarm.get(indices[i]);
         }
+
         double[] timesLL = new double[RUNS];
         long stepsLL = 0, movesLL = 0, compLL = 0;
         for (int r = 0; r < RUNS; r++) {
@@ -98,7 +101,7 @@ public class BenchmarkRunner {
             movesLL = list.getMetrics().moves;
             compLL = list.getMetrics().comparisons;
         }
-        writer.printf("W1,default,MyLinkedList,%d,%.4f,%d,%d,%d\n", n, median(timesLL), stepsLL, movesLL, compLL);
+        writer.printf(Locale.US, "W1,default,MyLinkedList,%d,%.4f,%d,%d,%d\n", n, median(timesLL), stepsLL, movesLL, compLL);
     }
 
     // W2: Search - 1 000 contains(x)
@@ -128,7 +131,7 @@ public class BenchmarkRunner {
             movesDA = da.getMetrics().moves;
             compDA = da.getMetrics().comparisons;
         }
-        writer.printf("W2,default,DynamicArray,%d,%.4f,%d,%d,%d\n", n, median(timesDA), stepsDA, movesDA, compDA);
+        writer.printf(Locale.US, "W2,default,DynamicArray,%d,%.4f,%d,%d,%d\n", n, median(timesDA), stepsDA, movesDA, compDA);
 
         // MyLinkedList
         double[] timesLL = new double[RUNS];
@@ -144,7 +147,7 @@ public class BenchmarkRunner {
             movesLL = list.getMetrics().moves;
             compLL = list.getMetrics().comparisons;
         }
-        writer.printf("W2,default,MyLinkedList,%d,%.4f,%d,%d,%d\n", n, median(timesLL), stepsLL, movesLL, compLL);
+        writer.printf(Locale.US, "W2,default,MyLinkedList,%d,%.4f,%d,%d,%d\n", n, median(timesLL), stepsLL, movesLL, compLL);
     }
 
     // W3: Insert & Remove - head and middle
@@ -174,7 +177,7 @@ public class BenchmarkRunner {
                 movesDA = da.getMetrics().moves;
                 compDA = da.getMetrics().comparisons;
             }
-            writer.printf("W3,%s,DynamicArray,%d,%.4f,%d,%d,%d\n", variant, n, median(timesDA), stepsDA, movesDA, compDA);
+            writer.printf(Locale.US, "W3,%s,DynamicArray,%d,%.4f,%d,%d,%d\n", variant, n, median(timesDA), stepsDA, movesDA, compDA);
 
             // MyLinkedList
             double[] timesLL = new double[RUNS];
@@ -197,7 +200,7 @@ public class BenchmarkRunner {
                 movesLL = list.getMetrics().moves;
                 compLL = list.getMetrics().comparisons;
             }
-            writer.printf("W3,%s,MyLinkedList,%d,%.4f,%d,%d,%d\n", variant, n, median(timesLL), stepsLL, movesLL, compLL);
+            writer.printf(Locale.US, "W3,%s,MyLinkedList,%d,%.4f,%d,%d,%d\n", variant, n, median(timesLL), stepsLL, movesLL, compLL);
         }
     }
 
@@ -223,6 +226,6 @@ public class BenchmarkRunner {
             moves = heap.getMetrics().moves;
             comp = heap.getMetrics().comparisons;
         }
-        writer.printf("W4,default,MinHeap,%d,%.4f,%d,%d,%d\n", n, median(times), steps, moves, comp);
+        writer.printf(Locale.US, "W4,default,MinHeap,%d,%.4f,%d,%d,%d\n", n, median(times), steps, moves, comp);
     }
 }
